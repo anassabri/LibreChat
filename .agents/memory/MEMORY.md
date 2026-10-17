@@ -1,0 +1,1 @@
+- [Package availability](package-availability.md) — registry metadata can succeed even when Replit's package service cannot supply the tarball.
