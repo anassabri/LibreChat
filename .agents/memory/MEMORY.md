@@ -1,1 +1,1 @@
-- [Package availability](package-availability.md) — registry metadata can succeed even when Replit's package service cannot supply the tarball.
+- [Package availability](package-availability.md) — package-firewall 404s can be caused by missing registry URL prefixes; verify the actual tarball route.
