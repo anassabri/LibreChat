@@ -7,6 +7,11 @@ if [[ -z "${MONGO_URI:-}" ]]; then
   exit 1
 fi
 
+if [[ "$MONGO_URI" != mongodb://* && "$MONGO_URI" != mongodb+srv://* ]]; then
+  echo "MONGO_URI must start with mongodb:// or mongodb+srv://. Enter the URI without surrounding quotes." >&2
+  exit 1
+fi
+
 if [[ ! -x node_modules/.bin/cross-env ]]; then
   echo "Dependencies are missing. Install the root npm workspace dependencies first." >&2
   exit 1
