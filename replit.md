@@ -37,11 +37,49 @@ values if they have already encrypted stored credentials. Never publish using
 workspace-local temporary keys. Production setup is separate from this
 development launcher.
 
-## Current setup limitation
+## Publishing dependency troubleshooting
 
-Dependency installation has not succeeded: Replit's package service returned
-HTTP 404 for `npm-run-path` tarballs (versions 4.0.1 and 5.3.0), including an
-attempt using the latest parent Jest package. No dependency upgrades were saved.
-Do not bypass the package firewall or broadly replace the project's tooling.
-The workflow is configured but not started until dependencies and MongoDB are
-available. A frontend build, HTTP checks and browser verification remain required.
+The deployment package installer uses the npm registry configured in this
+workspace:
+
+```sh
+npm config get registry
+# http://package-firewall.replit.internal/npm/
+```
+
+If a publish fails during `npm install` with a 404 URL like
+`http://package-firewall.replit.internal/npm-run-path/-/...`, compare it with the
+configured registry. The request is missing the `/npm/` path prefix; this can
+look like an unavailable package even though the package is present in Replit's
+firewall.
+
+For the current `npm-run-path` lock entries, the resolved URLs must retain the
+prefix:
+
+- `node_modules/npm-run-path` (4.0.1):
+  `http://package-firewall.replit.internal/npm/npm-run-path/-/npm-run-path-4.0.1.tgz`
+- `node_modules/lint-staged/node_modules/npm-run-path` (5.3.0):
+  `http://package-firewall.replit.internal/npm/npm-run-path/-/npm-run-path-5.3.0.tgz`
+
+To diagnose another package, check the exact tarball path through the configured
+firewall endpoint. For this incident, the correctly prefixed URL returned HTTP
+200 while the URL without `/npm/` returned 404.
+
+When fixing this specific error, update only the affected `resolved` URLs in
+`package-lock.json`. Preserve the locked versions and integrity hashes. Do not
+change package versions, point npm at a public registry, or replace the package
+manager as a workaround. Afterward, run the normal Replit-managed npm install
+and `npm run frontend` before publishing. A successful metadata lookup alone
+does not prove the tarball can be installed.
+
+These internal firewall URLs are Replit-specific. If moving the project to
+another host, restore portable registry URLs using that host's normal package
+installation workflow.
+
+## Current verification status
+
+The corrected dependency install and `npm run frontend` have succeeded in the
+workspace. The LibreChat workflow starts, connects to MongoDB, and serves the
+login page. A successful production publish has not yet been confirmed.
+Configure the stable production secrets listed above before relying on stored
+provider credentials or sessions.
