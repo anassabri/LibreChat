@@ -76,10 +76,33 @@ These internal firewall URLs are Replit-specific. If moving the project to
 another host, restore portable registry URLs using that host's normal package
 installation workflow.
 
+## MongoDB Atlas access from a published deployment
+
+A publish can build successfully and still fail its port/readiness check if
+LibreChat cannot connect to MongoDB. This server connects to MongoDB before it
+starts listening, so an Atlas network rejection can appear as “port 5000 was
+never opened” or repeated HTTP 500 health checks.
+
+Check the deployment runtime logs for Atlas messages about an IP not being
+whitelisted before changing the port or startup command. The public IP added
+for the Replit development workspace does not automatically allow the published
+Autoscale service. Atlas must allow the published service's outbound IP address
+or range as well. Replit's available documentation does not specify a fixed
+Autoscale egress IP, so confirm the production egress address/range rather than
+assuming the development IP applies.
+
+Keep the Atlas access list as narrow as the production network allows. An entry
+of `0.0.0.0/0` permits connection attempts from any IPv4 address and should not
+be left in place as a production setting. After adding the correct production
+egress entry, republish and confirm the runtime logs show MongoDB connected and
+the service listening on the configured port.
+
 ## Current verification status
 
 The corrected dependency install and `npm run frontend` have succeeded in the
 workspace. The LibreChat workflow starts, connects to MongoDB, and serves the
-login page. A successful production publish has not yet been confirmed.
+login page. The latest production attempt built successfully but did not start:
+MongoDB Atlas rejected the published service because its IP was not on the
+Atlas access list.
 Configure the stable production secrets listed above before relying on stored
 provider credentials or sessions.
