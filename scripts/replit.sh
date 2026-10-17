@@ -18,7 +18,7 @@ if [[ ! -x node_modules/.bin/cross-env ]]; then
 fi
 
 export HOST=0.0.0.0
-export PORT=5000
+export PORT="${PORT:-5000}"
 export SEARCH="${SEARCH:-false}"
 
 if [[ -n "${REPLIT_DEV_DOMAIN:-}" ]]; then

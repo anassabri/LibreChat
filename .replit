@@ -38,3 +38,8 @@ externalPort = 80
 
 [userenv.development]
 ALLOW_REGISTRATION = "true"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "scripts/replit.sh"]
+build = ["npm", "run", "frontend"]
