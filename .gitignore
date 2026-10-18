@@ -78,6 +78,7 @@ api/tsconfig.json
 #config file
 librechat.yaml
 librechat.yml
+!/librechat.yaml
 
 # Environment
 .env*
